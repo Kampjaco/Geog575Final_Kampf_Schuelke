@@ -1,6 +1,8 @@
 # Team Name
 
 ### Team Members
+- Jacob Kampf
+- Nathan Schuelke
 
 ### Final Proposal
 1. Persona/Scenario
