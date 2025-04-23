@@ -1,1 +1,7 @@
-/*insert style here*/
+#map {
+    height: 80vh;
+    border-radius: 0.5rem;
+}
+body {
+    background-color: #f8f9fa;
+}
