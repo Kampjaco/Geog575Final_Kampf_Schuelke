@@ -41,17 +41,5 @@ window.onload = function () {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 }
 

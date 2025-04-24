@@ -25,14 +25,25 @@
     </head>
 
     <body>
-        
-        <div class="container py-4">
-            <header class="mb-4">
+      <div class="container py-4">
+          <header class="mb-4">
               <h1 class="text-center text-primary">Department of Health Map Viewer</h1>
-            </header>
-        
-            <div id="map" class="shadow-sm"></div>
+          </header>
+  
+          <div class="row">
+              <!-- Sidebar for Population Pyramids -->
+              <div class="col-md-4 bg-light p-3" id="pyramid-container">
+                  <h2 class="text-center">Population Pyramid</h2>
+                  <p class="text-muted text-center">Select a county to see data</p>
+                  <!-- Placeholder for population pyramid graphics -->
+                  <div id="pyramid-chart" style="height: 400px;"></div>
+              </div>
+  
+              <!-- Map Container -->
+              <div class="col-md-8">
+                  <div id="map" class="shadow-sm"></div>
+              </div>
           </div>
-        
-    </body>
+      </div>
+  </body>
 </html>
