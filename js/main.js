@@ -2,6 +2,8 @@
 window.onload = function () {
     //Semi global variables
 
+    var map;
+
     
     //////////////////////////////////////////////
     /////////////////////////////////////////////
@@ -9,9 +11,11 @@ window.onload = function () {
 
     initializeMap();
 
+
+
     function initializeMap() {
 
-        const map = L.map('map', {
+        map = L.map('map', {
             center: [44.54599353054098, -89.8541798360329],
             zoom: 7,
             minZoom: 7,  // Set your desired zoom-out limit
@@ -23,6 +27,18 @@ window.onload = function () {
             subdomains: 'abcd',
           }).addTo(map);
 
+    }
+
+    var countyJson;
+
+    countyJson = L.geoJSON(countyData, {
+        style: county_style
+    }).addTo(map);
+
+    function county_style(feature) {
+        return {
+            color: '#7fed75'
+        };
     }
 
 
