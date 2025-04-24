@@ -11,12 +11,17 @@ window.onload = function () {
 
     function initializeMap() {
 
-        var map = L.map('map').setView([44.54746726659841, -89.96017005851391], 7);
+        const map = L.map('map', {
+            center: [44.54599353054098, -89.8541798360329],
+            zoom: 7,
+            minZoom: 7,  // Set your desired zoom-out limit
+            maxZoom: 16  // Optional: limit zoom in
+        });
 
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        }).addTo(map);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
+            subdomains: 'abcd',
+          }).addTo(map);
 
     }
 
