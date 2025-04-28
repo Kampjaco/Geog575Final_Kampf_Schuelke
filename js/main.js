@@ -12,6 +12,9 @@ window.onload = function () {
     var hospitalJson;
     var serDevJson;
 
+    //Selected year from dropdown menu
+    var selectedYear = "F1970_65_1";
+
     //////////////////////////////////////////////
     // MAP JAVASCRIPT //
 
@@ -39,6 +42,29 @@ window.onload = function () {
             attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
             subdomains: 'abcd',
         }).addTo(map);
+
+        // Create a custom control for the year selector
+        const yearControl = L.control({ position: 'topright' });
+
+        yearControl.onAdd = function () {
+            const div = L.DomUtil.create('div', 'year-control');
+
+            div.innerHTML = `
+                <select id="year-selector" class="form-select">
+                    <option value="F1970_65_1">1970</option>
+                    <option value="F1980_65_1">1980</option>
+                    <option value="F1990_65_1">1990</option>
+                    <option value="F2000_65_1">2000</option>
+                    <option value="F2010_65_1">2010</option>
+                    <option value="F2020_65_1">2020</option>
+                </select>
+            `;
+
+            return div;
+        };
+
+        // Add the year control to the map
+        yearControl.addTo(map);
     }
 
     function createLayers() {
@@ -97,6 +123,12 @@ window.onload = function () {
     }
 
     //COUNTY STYLING AND POPUP HELPER FUNCTIONS
+
+    //Styles map on decade change
+    document.getElementById("year-selector").addEventListener("change", function (e) {
+        selectedYear = e.target.value; // Update selected year
+        countyJson.setStyle(county_style); // Reapply styling to update colors
+    });
  
     //Executes when a county is highlighted
     function onEachCounty(feature, layer) {
@@ -105,7 +137,7 @@ window.onload = function () {
             mouseout: resetHighlight,
             click: function(e) {
                 showCountyPopup(e);
-                updatePyramid(e.target.feature.properties.COUNTY_1);
+                updatePyramid(e.target.feature.properties.COUNTY_1, selectedYear.slice(1,5)); //Slice selected year because we only want the number value, not the other text used in identifying the shapefile field
             }
         });
     }
@@ -138,8 +170,10 @@ window.onload = function () {
         const layer = e.target;
         const props = layer.feature.properties;
 
+        selectedYear = document.getElementById("year-selector").value;
+
         const popupContent = `<strong>${props.COUNTY_1}</strong><br>` +
-                             `Population Percentage over 65 y/o: ${props.F2020_65_1}%`;
+                             `Population Percentage over 65 y/o: ${props[selectedYear]}%`;
 
         const popup = L.popup({
             closeButton: false,
@@ -153,7 +187,7 @@ window.onload = function () {
 
     function county_style(feature) {
         return {
-            fillColor: getCountyColor(feature.properties.F2020_65_1),
+            fillColor: getCountyColor(feature.properties[selectedYear]),
             weight: 1,
             opacity: 1,
             color: 'gray',
@@ -176,16 +210,19 @@ window.onload = function () {
     //////////////////////////////////////////////
     // POPULATION PYRAMID JAVASCRIPT //
 
-    function updatePyramid(county) {
+    function updatePyramid(county, year) {
 
         d3.csv("data/age_pyramid_data.csv").then(function(data) {
             // Filter the data for a specific county and year
-            const countyPyramidData = prepareData(data, county, 2000);
+            const countyPyramidData = prepareData(data, county, year);
 
             // Remove the existing pyramid SVG
             d3.select("#pyramid-chart").select("svg").remove();
 
             renderPyramid(countyPyramidData);
+
+            //Update text header content
+            document.getElementById("pyramid-header-one").textContent = `${county} ${year} Population Pyramid`
         });
 
     }
@@ -209,6 +246,7 @@ window.onload = function () {
     }
 
     function renderPyramid(data) {
+
         const width = window.innerWidth * .25;
         const height = window.innerHeight * .7;
         const margin = { top: 20, right: 30, bottom: 40, left: 40 };
@@ -247,6 +285,7 @@ window.onload = function () {
             .attr("width", d => x(d.total) - x(0))
             .attr("height", y.bandwidth())
             .attr("fill", "steelblue");
+        
     }
 
 };
