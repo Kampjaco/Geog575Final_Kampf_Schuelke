@@ -176,7 +176,7 @@ window.onload = function () {
 
     d3.csv("data/age_pyramid_data.csv").then(function(data) {
         // Filter the data for a specific county and year
-        const countyData = prepareData(data, "Adams County", 1970);
+        const countyData = prepareData(data, "Adams County", 2000);
         renderPyramid(countyData);
     });
 
