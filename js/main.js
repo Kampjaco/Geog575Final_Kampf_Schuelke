@@ -30,8 +30,8 @@ window.onload = function () {
     function initializeMap() {
         map = L.map('map', {
             center: [44.54599353054098, -89.8541798360329],
-            zoom: 7,
-            minZoom: 7,  // Set your desired zoom-out limit
+            zoom: 6,
+            minZoom: 6,  // Set your desired zoom-out limit
             maxZoom: 16  // Optional: limit zoom in
         });
 
@@ -101,7 +101,10 @@ window.onload = function () {
         layer.on({
             mouseover: highlightFeature,
             mouseout: resetHighlight,
-            click: showCountyPopup
+            click: function(e) {
+                showCountyPopup(e);
+                updatePyramid(e.target.feature.properties.COUNTY_1)
+            }
         });
     }
 
@@ -167,6 +170,7 @@ window.onload = function () {
                          '#ffffff'; // Default color if value is below 5
     }
 
+
     //////////////////////////////////////////////
     // POPULATION PYRAMID JAVASCRIPT //
 
@@ -193,8 +197,8 @@ window.onload = function () {
     }
 
     function renderPyramid(data) {
-        const width = 800;
-        const height = 600;
+        const width = window.innerWidth * .25;
+        const height = window.innerHeight * .7;
         const margin = { top: 20, right: 30, bottom: 40, left: 40 };
 
         const svg = d3.select("#pyramid-chart")
@@ -231,5 +235,13 @@ window.onload = function () {
             .attr("width", d => x(d.total) - x(0))
             .attr("height", y.bandwidth())
             .attr("fill", "steelblue");
+    }
+
+    function updatePyramid(county) {
+        const pyramidData = prepareData(data, county, 2020);
+
+        d3.select("#pyramid-chart").select("svg").remove();
+
+        renderPyramid(pyramidData);
     }
 };
