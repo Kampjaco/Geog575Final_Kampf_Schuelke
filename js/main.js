@@ -52,6 +52,8 @@ window.onload = function () {
 
         });
 
+        console.log(countyData)
+
         servDevJson = L.geoJSON(healthcareDevSitesData, {
 
         });
@@ -103,7 +105,7 @@ window.onload = function () {
             mouseout: resetHighlight,
             click: function(e) {
                 showCountyPopup(e);
-                updatePyramid(e.target.feature.properties.COUNTY_1)
+                updatePyramid(e.target.feature.properties.COUNTY_1);
             }
         });
     }
@@ -174,11 +176,21 @@ window.onload = function () {
     //////////////////////////////////////////////
     // POPULATION PYRAMID JAVASCRIPT //
 
-    d3.csv("data/age_pyramid_data.csv").then(function(data) {
-        // Filter the data for a specific county and year
-        const countyData = prepareData(data, "Adams County", 2000);
-        renderPyramid(countyData);
-    });
+    function updatePyramid(county) {
+
+        d3.csv("data/age_pyramid_data.csv").then(function(data) {
+            // Filter the data for a specific county and year
+            const countyPyramidData = prepareData(data, county, 2000);
+
+            // Remove the existing pyramid SVG
+            d3.select("#pyramid-chart").select("svg").remove();
+
+            renderPyramid(countyPyramidData);
+        });
+
+    }
+
+
 
     function prepareData(data, county, year) {
         const selectedCounty = data.find(d => d.COUNTY === county);
@@ -237,11 +249,4 @@ window.onload = function () {
             .attr("fill", "steelblue");
     }
 
-    function updatePyramid(county) {
-        const pyramidData = prepareData(data, county, 2020);
-
-        d3.select("#pyramid-chart").select("svg").remove();
-
-        renderPyramid(pyramidData);
-    }
 };
