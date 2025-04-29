@@ -246,35 +246,34 @@ window.onload = function () {
     }
 
     function renderPyramid(data) {
-
-        const width = window.innerWidth * .25;
-        const height = window.innerHeight * .7;
+        const width = window.innerWidth * 0.25;
+        const height = window.innerHeight * 0.7;
         const margin = { top: 20, right: 30, bottom: 40, left: 40 };
-
+    
         const svg = d3.select("#pyramid-chart")
             .append("svg")
             .attr("width", width)
             .attr("height", height);
-
+    
         const x = d3.scaleLinear()
             .domain([0, d3.max(data, d => d.total)])
             .range([margin.left, width - margin.right]);
-
+    
         const y = d3.scaleBand()
             .domain(data.map(d => d.ageGroup))
             .range([height - margin.bottom, margin.top])
             .padding(0.1);
-
+    
         // X-Axis
         svg.append("g")
             .attr("transform", `translate(0,${height - margin.bottom})`)
             .call(d3.axisBottom(x).ticks(5));
-
+    
         // Y-Axis
         svg.append("g")
             .attr("transform", `translate(${margin.left},0)`)
             .call(d3.axisLeft(y).tickSize(0));
-
+    
         // Total Population Bars
         svg.selectAll(".bar-total")
             .data(data)
@@ -285,7 +284,18 @@ window.onload = function () {
             .attr("width", d => x(d.total) - x(0))
             .attr("height", y.bandwidth())
             .attr("fill", "steelblue");
-        
+    
+        // Add Total Numbers to the End of Bars
+        svg.selectAll(".bar-label")
+            .data(data)
+            .enter().append("text")
+            .attr("class", "bar-label")
+            .attr("x", d => x(d.total) + 5) // Slight offset for visibility
+            .attr("y", d => y(d.ageGroup) + y.bandwidth() / 2)
+            .attr("dy", "0.35em") // Vertically center the text
+            .style("fill", "black")
+            .style("font-size", "12px") // Adjust font size as needed
+            .text(d => d.total); // Display the total value
     }
 
 };
