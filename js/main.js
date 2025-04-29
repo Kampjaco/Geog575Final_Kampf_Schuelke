@@ -210,23 +210,37 @@ window.onload = function () {
     //////////////////////////////////////////////
     // POPULATION PYRAMID JAVASCRIPT //
 
-    function updatePyramid(county, year) {
+    // Variable to store pinned pyramid data
+    let pinnedPyramidData = null; // Step 2: Initialize a global variable for pinned data
 
+    function updatePyramid(county, year) {
         d3.csv("data/age_pyramid_data.csv").then(function(data) {
-            // Filter the data for a specific county and year
+            // Filter the data for the selected county and year
             const countyPyramidData = prepareData(data, county, year);
 
+            // Store the current pyramid data for rendering
+            let currentPyramidData = countyPyramidData; // Add the current pyramid data
+            
             // Remove the existing pyramid SVG
             d3.select("#pyramid-chart").select("svg").remove();
 
-            renderPyramid(countyPyramidData);
+            // Render both pyramids if one is pinned
+            if (pinnedPyramidData) {
+                renderPyramids(currentPyramidData, pinnedPyramidData); // Rendering comparison view
+            } else {
+                renderPyramid(currentPyramidData); // Render single pyramid
+            }
 
-            //Update text header content
-            document.getElementById("pyramid-header-one").textContent = `${county} ${year} Population Pyramid`
+            // Update header content
+            document.getElementById("pyramid-header-one").textContent = `${county} ${year} Population Pyramid`;
         });
-
     }
 
+    // Add a pin button event listener to store pinned data
+    document.getElementById("pin-pyramid").addEventListener("click", function() {
+        pinnedPyramidData = currentPyramidData; // Pin the current pyramid's data
+        alert("Pyramid pinned! Select another county to compare.");
+    });
 
 
     function prepareData(data, county, year) {
