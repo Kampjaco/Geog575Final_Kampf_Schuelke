@@ -74,14 +74,40 @@ window.onload = function () {
             onEachFeature: onEachCounty
         }).addTo(map);
 
-        hospitalJson = L.geoJSON(criticalHospitalData, {
+        //Critical Hospitals icon
+        const hospitalIcon = L.icon({
+            iconUrl: 'img/hospital.png',
+            iconSize: [20, 20],    
+            iconAnchor: [15, 30],        
+            popupAnchor: [0, -30]  
+        });
+        
+        //Healthcare Service Delivery Sites Icon
+        const healthServIcon = L.icon({
+            iconUrl: 'img/health_serv.png',
+            iconSize: [20, 20],      
+            iconAnchor: [15, 30],       
+            popupAnchor: [0, -30]  
+        });
 
+        hospitalJson = L.geoJSON(criticalHospitalData, {
+            pointToLayer: function (feature, latlng) {
+                return L.marker(latlng, { icon: hospitalIcon });
+            },
+            onEachFeature: function (feature, layer) {
+                layer.bindPopup(`<b>Hospital:</b> ${feature.properties.FACILITY_N}`)
+            }
         });
 
         console.log(countyData)
 
         servDevJson = L.geoJSON(healthcareDevSitesData, {
-
+            pointToLayer: function (feature, latlng) {
+                return L.marker(latlng, { icon: healthServIcon });
+            },
+            onEachFeature: function (feature, layer) {
+                layer.bindPopup(`<b>Site:</b> ${feature.properties.SITE_NM}`)
+            }
         });
 
     }
@@ -99,12 +125,24 @@ window.onload = function () {
             var colors = ['#feebe2', '#fcc5c0', '#fa9fb5', '#f768a1', '#c51b8a', '#7a0177']; // Matching colors
 
             // Generate legend content
-            div.innerHTML += '<h4>% Over 65</h4>'; // Add title to legend
+            div.innerHTML += '<h5>% Over 65</h5>'; // Add title to legend
             for (var i = 0; i < percents.length; i++) {
                 div.innerHTML +=
                     '<i style="background:' + colors[i] + '"></i> ' +
                     percents[i] + (percents[i + 1] ? '&ndash;' + percents[i + 1] + '<br>' : '+');
             }
+
+            // Icon section title
+            div.innerHTML += '<hr><h5>Facilities</h5>';
+
+            // Add hospital icon
+            div.innerHTML +=
+                '<img src="img/hospital.png" style="width:15px; vertical-align:middle;"> Hospital<br>';
+
+            // Add service delivery site icon
+            div.innerHTML +=
+                '<img src="img/health_serv.png" style="width:15px; vertical-align:middle;"> Service Site<br>';
+
 
             return div;
         };
@@ -177,7 +215,6 @@ window.onload = function () {
 
         const popup = L.popup({
             closeButton: false,
-            autoPan: false,
             offset: L.point(10, 0)
         })
         .setLatLng(e.latlng)
@@ -210,8 +247,10 @@ window.onload = function () {
     //////////////////////////////////////////////
     // POPULATION PYRAMID JAVASCRIPT //
 
-    // Variable to store pinned pyramid data
-    let pinnedPyramidData = null; // Step 2: Initialize a global variable for pinned data
+    // Variables to store pinned pyramid data
+    let pinnedLeftData = null;
+    let pinnedMiddleData = null;
+    let currentPyramidData = null; 
 
     function updatePyramid(county, year) {
         d3.csv("data/age_pyramid_data.csv").then(function(data) {
@@ -219,28 +258,61 @@ window.onload = function () {
             const countyPyramidData = prepareData(data, county, year);
 
             // Store the current pyramid data for rendering
-            let currentPyramidData = countyPyramidData; // Add the current pyramid data
+            currentPyramidData = countyPyramidData; // Add the current pyramid data
             
-            // Remove the existing pyramid SVG
-            d3.select("#pyramid-chart").select("svg").remove();
+            // Remove the existing unpinned pyramid SVG
+            d3.select(getUnpinnedChart()).select("svg").remove();
 
-            // Render both pyramids if one is pinned
-            if (pinnedPyramidData) {
-                renderPyramids(currentPyramidData, pinnedPyramidData); // Rendering comparison view
-            } else {
-                renderPyramid(currentPyramidData); // Render single pyramid
+            //Renders a pyramid if there is an unpinned container
+            if(!pinnedLeftData || !pinnedMiddleData) {
+
+                renderPyramid(currentPyramidData);
+                // Update header content
+                document.getElementById("pyramid-header-one").textContent = `${county} ${year} Population Pyramid`;
+                document.getElementById("pyramid-instruction").classList.add("d-none"); 
+                document.getElementById("pin-left").classList.remove("d-none");
             }
 
-            // Update header content
-            document.getElementById("pyramid-header-one").textContent = `${county} ${year} Population Pyramid`;
+            document.getElementById("pin-left").addEventListener("click", function() {
+                togglePin("pin-left");
+            
+                if (pinnedLeftData) {
+                    pinnedLeftData = null;
+                    document.getElementById("pyramid-header-one").textContent = "Population Pyramid"; // Reset header
+                } else {
+                    pinnedLeftData = currentPyramidData;
+                }
+            });
+            
+            document.getElementById("pin-middle").addEventListener("click", function() {
+                togglePin("pin-middle");
+            
+                if (pinnedMiddleData) {
+                    pinnedMiddleData = null;
+                    document.getElementById("pyramid-header-two").textContent = "Pinned Pyramid"; // Reset header
+                } else {
+                    pinnedMiddleData = currentPyramidData;
+                }
+            });
+
+        
+
         });
     }
 
-    // Add a pin button event listener to store pinned data
-    document.getElementById("pin-pyramid").addEventListener("click", function() {
-        pinnedPyramidData = currentPyramidData; // Pin the current pyramid's data
-        alert("Pyramid pinned! Select another county to compare.");
-    });
+    function togglePin(buttonId) {
+        let button = document.getElementById(buttonId);
+
+        //Makes middle container visible after pinning left container
+        document.getElementById("middle-container").classList.remove("d-none");
+        
+        // Check current state and toggle text
+        if (button.textContent === "Pin") {
+            button.textContent = "Unpin";
+        } else {
+            button.textContent = "Pin";
+        }
+    }
 
 
     function prepareData(data, county, year) {
@@ -262,12 +334,13 @@ window.onload = function () {
     function renderPyramid(data) {
         const width = window.innerWidth * 0.25;
         const height = window.innerHeight * 0.7;
-        const margin = { top: 20, right: 30, bottom: 40, left: 40 };
+        const margin = { top: 20, right: 30, bottom: 40, left: 47 };
     
-        const svg = d3.select("#pyramid-chart")
+        const svg = d3.select(getUnpinnedChart())
             .append("svg")
             .attr("width", width)
             .attr("height", height);
+        console.log(svg);
     
         const x = d3.scaleLinear()
             .domain([0, d3.max(data, d => d.total)])
@@ -310,6 +383,20 @@ window.onload = function () {
             .style("fill", "black")
             .style("font-size", "12px") // Adjust font size as needed
             .text(d => d.total); // Display the total value
+    }
+
+    function getUnpinnedChart() {
+
+        //No pinned left data
+        if(!pinnedLeftData) {
+            return "#left-pyramid-chart";
+        //No pinned middle data
+        } else if(!pinnedMiddleData) {
+            return "#middle-pyramid-chart";
+        }
+        //Both cotainers have pinned graphs
+        return;
+        
     }
 
 };
