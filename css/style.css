@@ -3,7 +3,7 @@
     border-radius: 0.5rem;
 }
 
-#map-container {
+#left-container, #middle-container, #map-container {
     height: 85vh;
 }
 
@@ -22,7 +22,7 @@
     opacity: 0.7;
 }
 
-#pin-left, #pin-middle {
+#left-pin, #middle-pin {
     display: block;
     margin: 10px auto; /* Centers the button horizontally */
     text-align: center;

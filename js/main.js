@@ -248,9 +248,9 @@ window.onload = function () {
     // POPULATION PYRAMID JAVASCRIPT //
 
     // Variables to store pinned pyramid data
-    let pinnedLeftData = null;
-    let pinnedMiddleData = null;
-    let currentPyramidData = null; 
+    var pinnedLeftData = null;
+    var pinnedMiddleData = null;
+    var currentPyramidData = null; 
 
     function updatePyramid(county, year) {
         d3.csv("data/age_pyramid_data.csv").then(function(data) {
@@ -264,38 +264,44 @@ window.onload = function () {
             d3.select(getUnpinnedChart()).select("svg").remove();
 
             //Renders a pyramid if there is an unpinned container
-            if(!pinnedLeftData || !pinnedMiddleData) {
+            if(!pinnedLeftData) {
 
                 renderPyramid(currentPyramidData);
-                // Update header content
-                document.getElementById("pyramid-header-one").textContent = `${county} ${year} Population Pyramid`;
-                document.getElementById("pyramid-instruction").classList.add("d-none"); 
-                document.getElementById("pin-left").classList.remove("d-none");
+                
+                // Update left header content
+                document.getElementById("left-pyramid-header").textContent = `${county} ${year} Population Pyramid`;
+                document.getElementById("left-pyramid-instruction").classList.add("d-none"); 
+                document.getElementById("left-pin").classList.remove("d-none");
+                
+            } else if(!pinnedMiddleData) {
+
+                renderPyramid(currentPyramidData);
+
+                //Updates middle header content
+                document.getElementById("middle-pyramid-header").textContent = `${county} ${year} Population Pyramid`;
+                document.getElementById("middle-pyramid-instruction").classList.add("d-none"); 
+                document.getElementById("middle-pin").classList.remove("d-none");
             }
 
-            document.getElementById("pin-left").addEventListener("click", function() {
-                togglePin("pin-left");
+            document.getElementById("left-pin").addEventListener("click", function() {
+                togglePin("left-pin");
             
                 if (pinnedLeftData) {
                     pinnedLeftData = null;
-                    document.getElementById("pyramid-header-one").textContent = "Population Pyramid"; // Reset header
                 } else {
                     pinnedLeftData = currentPyramidData;
                 }
             });
             
-            document.getElementById("pin-middle").addEventListener("click", function() {
-                togglePin("pin-middle");
+            document.getElementById("middle-pin").addEventListener("click", function() {
+                togglePin("middle-pin");
             
                 if (pinnedMiddleData) {
                     pinnedMiddleData = null;
-                    document.getElementById("pyramid-header-two").textContent = "Pinned Pyramid"; // Reset header
                 } else {
                     pinnedMiddleData = currentPyramidData;
                 }
             });
-
-        
 
         });
     }
@@ -334,7 +340,7 @@ window.onload = function () {
     function renderPyramid(data) {
         const width = window.innerWidth * 0.25;
         const height = window.innerHeight * 0.7;
-        const margin = { top: 20, right: 30, bottom: 40, left: 47 };
+        const margin = { top: 20, right: 30, bottom: 50, left: 47 };
     
         const svg = d3.select(getUnpinnedChart())
             .append("svg")
