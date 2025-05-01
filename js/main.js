@@ -209,13 +209,18 @@ window.onload = function () {
         const props = layer.feature.properties;
 
         selectedYear = document.getElementById("year-selector").value;
+        totalPop = selectedYear.substring(0,5) + '_pop';
+        pop65Plus = selectedYear.substring(0,5) + '_65_p';
 
         const popupContent = `<strong>${props.COUNTY_1}</strong><br>` +
+                             `Total Population: ${props[totalPop]} <br>` +
+                             `Population over 65 y/o: ${props[pop65Plus]} <br>` +
                              `Population Percentage over 65 y/o: ${props[selectedYear]}%`;
 
         const popup = L.popup({
             closeButton: false,
-            offset: L.point(10, 0)
+            offset: L.point(10, 10),
+            keepInView: true
         })
         .setLatLng(e.latlng)
         .setContent(popupContent)
@@ -252,6 +257,9 @@ window.onload = function () {
     var pinnedMiddleData = null;
     var currentPyramidData = null; 
 
+    //Sets up pin event listeners
+    setupPinListeners();
+
     function updatePyramid(county, year) {
         d3.csv("data/age_pyramid_data.csv").then(function(data) {
             // Filter the data for the selected county and year
@@ -282,27 +290,28 @@ window.onload = function () {
                 document.getElementById("middle-pyramid-instruction").classList.add("d-none"); 
                 document.getElementById("middle-pin").classList.remove("d-none");
             }
+        });
+    }
 
-            document.getElementById("left-pin").addEventListener("click", function() {
-                togglePin("left-pin");
-            
-                if (pinnedLeftData) {
-                    pinnedLeftData = null;
-                } else {
-                    pinnedLeftData = currentPyramidData;
-                }
-            });
-            
-            document.getElementById("middle-pin").addEventListener("click", function() {
-                togglePin("middle-pin");
-            
-                if (pinnedMiddleData) {
-                    pinnedMiddleData = null;
-                } else {
-                    pinnedMiddleData = currentPyramidData;
-                }
-            });
-
+    function setupPinListeners() {
+        document.getElementById("left-pin").addEventListener("click", function() {
+            togglePin("left-pin");
+    
+            if (pinnedLeftData) {
+                pinnedLeftData = null;
+            } else {
+                pinnedLeftData = currentPyramidData;
+            }
+        });
+    
+        document.getElementById("middle-pin").addEventListener("click", function() {
+            togglePin("middle-pin");
+    
+            if (pinnedMiddleData) {
+                pinnedMiddleData = null;
+            } else {
+                pinnedMiddleData = currentPyramidData;
+            }
         });
     }
 

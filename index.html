@@ -34,14 +34,16 @@
     </head>
 
     <body>
-        <div class="container-fluid px-5">
-            <header class="mb-4">
-                <h1 class="text-center text-primary">Department of Health Map Viewer</h1>
+        <div class="background container-fluid px-5">
+            <header class="mb-1 py-2 bg-light shadow rounded">
+                <h1 class="text-center text-primary fw-bold">Age Demographics Across WI Counties</h1>
             </header>
+            
+            
         
             <div class="row justify-content-between gx-5">
                 <!-- Sidebar for Population Pyramids -->
-                <div class="bg-white p-4 mt-5 rounded shadow" style="width: 30%;" id="left-container">
+                <div class="bg-white p-4 mt-4 rounded shadow" style="width: 30%;" id="left-container">
                     <h2 class="text-center" id="left-pyramid-header">Population Pyramid</h2>
                     <button id="left-pin" class="btn btn-primary d-none">Pin</button>
                     <p class="text-muted text-center"id="left-pyramid-instruction">Select a county to see data</p>
@@ -50,7 +52,7 @@
                 </div>
 
                 <!-- Middle Pyramid Container -->
-                <div class="bg-white p-4 mt-5 rounded shadow d-none" style="width: 30%;" id="middle-container">
+                <div class="bg-white p-4 mt-4 rounded shadow d-none" style="width: 30%;" id="middle-container">
                     <h2 class="text-center" id="middle-pyramid-header">Population Pyramid</h2>
                     <button id="middle-pin" class="btn btn-primary">Pin</button>
                     <p class="text-muted text-center"id="middle-pyramid-instruction">Select a county to see data</p> 
@@ -58,7 +60,7 @@
                 </div>
         
                 <!-- Map Container -->
-                <div class="bg-white p-4 mt-5 rounded shadow" id="map-container" style="width: 30%">
+                <div class="bg-white p-4 mt-4 rounded shadow" id="map-container" style="width: 30%">
                    
                     <div id="map" style="height: 100%;"></div>
                 </div>
