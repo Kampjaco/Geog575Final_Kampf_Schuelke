@@ -414,4 +414,8 @@ window.onload = function () {
         
     }
 
+    document.getElementById("close-splash").addEventListener("click", function () {
+        document.getElementById("splash-screen").style.display = "none";
+    });
+    
 };
