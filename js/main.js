@@ -21,7 +21,7 @@ window.onload = function () {
     //Creates Leaflet map
     initializeMap();
 
-    //Creates GeoJSOND layers
+    //Creates GeoJSON layers
     createLayers();
 
     //Creates and adds a legend for the county layer
