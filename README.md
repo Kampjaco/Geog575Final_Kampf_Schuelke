@@ -4,7 +4,7 @@
 - Jacob Kampf
 - Nathan Schuelke
 
-Link to website:
+Link to website: https://kampjaco.github.io/Geog575Final_Kampf_Schuelke/
 
 
 
